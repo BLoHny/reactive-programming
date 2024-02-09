@@ -31,6 +31,22 @@ public class StepVerifierRecordTest {
                 .verify();
     }
 
+    @Test
+    public void test() {
+        StepVerifier
+                .create(getCountry(Flux.just("france", "russia", "greece", "poland")))
+                .expectSubscription()
+                .recordWith(ArrayList::new)
+                .thenConsumeWhile(country -> !country.isEmpty())
+                .expectRecordedMatches(countries ->
+                        countries
+                                .stream()
+                                .allMatch(country ->
+                                        Character.isUpperCase(country.charAt(0))))
+                .expectComplete()
+                .verify();
+    }
+
     private static Flux<String> getCountry(Flux<String> just) {
         return just
                 .map(c -> c.substring(0, 1).toUpperCase() + c.substring(1));
